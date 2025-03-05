@@ -1,4 +1,4 @@
-import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, Image, StyleSheet, TouchableOpacity, ToastAndroid } from "react-native";
 import React, { useState } from "react";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Colors from "@/data/Colors";
@@ -12,7 +12,12 @@ const SignUp = () => {
   const [email, setEmail] = useState<string | undefined>();
   const [password, setPassword] = useState<string | undefined>();
 
-  const onBtnPress = () => {};
+  const onBtnPress = () => {
+    if(!email || !password || !fullName)
+    {
+      ToastAndroid.show("Please fill all the fields", ToastAndroid.BOTTOM);
+    }
+  };
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -83,7 +88,7 @@ const SignUp = () => {
         onChangeText={(v) => setPassword(v)}
       />
 
-      <Button text="Create Account" onPress={() => onBtnPress} />
+      <Button text="Create Account" onPress={onBtnPress} />
     </View>
   );
 };
