@@ -5,6 +5,10 @@ import Colors from "@/data/Colors";
 import TextInputField from "@/components/Shared/TextInputField";
 import Button from "@/components/Shared/Button";
 import * as ImagePicker from "expo-image-picker";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/configs/FirebaseConfig";
+import { upload } from "cloudinary-react-native"
+import { cld, options } from "@/configs/CloudinaryConfig";
 
 const SignUp = () => {
   const [profileImage, setProfileImage] = useState<string | undefined>();
@@ -16,8 +20,29 @@ const SignUp = () => {
     if(!email || !password || !fullName)
     {
       ToastAndroid.show("Please fill all the fields", ToastAndroid.BOTTOM);
+      return;
     }
-  };
+    createUserWithEmailAndPassword(auth, email, password)
+    .then(async(userCredential) => {
+      console.log(userCredential);
+
+      await upload(cld, {
+        file: profileImage,
+        options: options,
+        callback: async(error:any, response:any) => {
+          if(error) {
+            console.log(error);
+          }
+          if(response){
+            console.log(response?.url);
+          }
+        }
+      })
+  }).catch((error)=> {
+    const errorMsg=error?.message
+    ToastAndroid.show(errorMsg, ToastAndroid.BOTTOM);
+  });
+}
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
