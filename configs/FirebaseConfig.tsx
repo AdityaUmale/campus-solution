@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
+import { Platform } from 'react-native';
 //@ts-ignore
 import { getAuth, initializeAuth, getReactNativePersistence  } from "firebase/auth";
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
@@ -22,7 +22,18 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-export const auth = initializeAuth(app, {
-  persistence: getReactNativePersistence(ReactNativeAsyncStorage)
-});
-const analytics = getAnalytics(app);
+
+// Initialize Auth with the correct configuration based on platform
+let auth;
+if (Platform.OS === 'web') {
+  auth = getAuth(app);
+} else {
+  auth = initializeAuth(app, {
+    persistence: getReactNativePersistence(ReactNativeAsyncStorage)
+  });
+}
+
+export { auth };
+
+// Only initialize analytics if not on a mobile device
+const analytics = Platform.OS === 'web' ? getAnalytics(app) : null;
